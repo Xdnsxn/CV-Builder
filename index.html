@@ -182,6 +182,41 @@
     margin:8px 2px 0;
     line-height:1.4;
   }
+  .mode-sample{
+    margin-top:10px;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--paper);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .mode-sample-name{
+    font-family:'Source Serif 4',serif;
+    font-weight:700;
+    color:var(--ink);
+    font-size:1rem;
+  }
+  .mode-sample-pill{
+    font-size:0.78rem;
+    background:var(--accent-soft);
+    color:var(--accent);
+    padding:4px 10px;
+    border-radius:20px;
+    font-weight:600;
+  }
+  .mode-sample.online .mode-sample-name{
+    font-family:'Inter',Arial,sans-serif;
+  }
+  .mode-sample.online .mode-sample-pill{
+    background:none;
+    color:var(--ink);
+    padding:0;
+    border-radius:0;
+    font-weight:400;
+  }
 
   .download-btn{
     width:100%;
@@ -386,6 +421,10 @@
         <button type="button" class="mode-btn" data-mode="online">Online submission</button>
       </div>
       <p class="mode-hint" id="modeHint">Styled layout for a printed CV you hand over in person.</p>
+      <div class="mode-sample" id="modeSample">
+        <span class="mode-sample-name">Aa Name</span>
+        <span class="mode-sample-pill">Skill</span>
+      </div>
     </div>
 
     <div class="field-group">
@@ -643,33 +682,13 @@
   let mode = 'person';
   const modeBtns = document.querySelectorAll('.mode-btn');
   const modeHint = document.getElementById('modeHint');
+  const modeSample = document.getElementById('modeSample');
   const previewEl = document.getElementById('preview');
   modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       mode = btn.dataset.mode;
       modeBtns.forEach(b => b.classList.toggle('active', b === btn));
       previewEl.classList.toggle('online', mode === 'online');
+      modeSample.classList.toggle('online', mode === 'online');
       modeHint.textContent = mode === 'online'
-        ? 'Plain, single-column layout designed to parse cleanly in ATS software.'
-        : 'Styled layout for a printed CV you hand over in person.';
-    });
-  });
-
-  document.querySelectorAll('#editPane input, #editPane textarea').forEach(el => {
-    if(!el.closest('#expList')) el.addEventListener('input', renderPreview);
-  });
-
-  document.getElementById('addExpBtn').addEventListener('click', () => addExperience());
-  document.getElementById('addRefBtn').addEventListener('click', () => addReference());
-  document.getElementById('downloadBtn').addEventListener('click', () => window.print());
-
-  // Mobile tabs
-  const tabEdit = document.getElementById('tabEdit');
-  const tabPreview = document.getElementById('tabPreview');
-  const editPane = document.getElementById('editPane');
-  const previewPane = document.getElementById('previewPane');
-  tabEdit.addEventListener('click', () => {
-    tabEdit.classList.add('active'); tabPreview.classList.remove('active');
-    editPane.classList.add('active'); previewPane.classList.remove('active');
-  });
-  tabPreview.addEve
+       
