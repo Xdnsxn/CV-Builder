@@ -426,6 +426,12 @@
       <button class="add-btn" id="addExpBtn" type="button">+ Add experience</button>
     </div>
 
+    <div class="field-group">
+      <h2>References</h2>
+      <div id="refList"></div>
+      <button class="add-btn" id="addRefBtn" type="button">+ Add reference</button>
+    </div>
+
     <button class="download-btn" id="downloadBtn" type="button">Download as PDF</button>
   </section>
 
@@ -448,6 +454,11 @@
       <div id="expBlock" style="display:none;">
         <h3>Experience</h3>
         <div id="pExp"></div>
+      </div>
+
+      <div id="refBlock" style="display:none;">
+        <h3>References</h3>
+        <div id="pRef"></div>
       </div>
     </div>
   </section>
@@ -501,6 +512,58 @@
       div.querySelector('.remove-btn').addEventListener('click', () => removeExperience(e.id));
       div.querySelectorAll('[data-field]').forEach(input => {
         input.addEventListener('input', () => updateExperience(e.id, input.dataset.field, input.value));
+      });
+      list.appendChild(div);
+    });
+  }
+
+  let references = [];
+  let refCounter = 0;
+
+  function addReference(data){
+    const id = refCounter++;
+    references.push({ id, name:'', relation:'', company:'', contact:'', ...data });
+    renderRefForm();
+    renderPreview();
+  }
+
+  function removeReference(id){
+    references = references.filter(r => r.id !== id);
+    renderRefForm();
+    renderPreview();
+  }
+
+  function updateReference(id, field, value){
+    const r = references.find(x => x.id === id);
+    if(r){ r[field] = value; renderPreview(); }
+  }
+
+  function renderRefForm(){
+    const list = document.getElementById('refList');
+    list.innerHTML = '';
+    references.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'exp-entry';
+      div.innerHTML = `
+        <button type="button" class="remove-btn" aria-label="Remove reference">&times;</button>
+        <label>Name</label>
+        <input type="text" placeholder="Temba Klaas" data-field="name" value="${escapeAttr(r.name)}">
+        <div class="row2">
+          <div>
+            <label>Relationship / title</label>
+            <input type="text" placeholder="Former Manager" data-field="relation" value="${escapeAttr(r.relation)}">
+          </div>
+          <div>
+            <label>Company</label>
+            <input type="text" placeholder="Nomvete & Klaas Consulting" data-field="company" value="${escapeAttr(r.company)}">
+          </div>
+        </div>
+        <label>Contact</label>
+        <input type="text" placeholder="temba.klaas@email.com · 082 345 6789" data-field="contact" value="${escapeAttr(r.contact)}">
+      `;
+      div.querySelector('.remove-btn').addEventListener('click', () => removeReference(r.id));
+      div.querySelectorAll('[data-field]').forEach(input => {
+        input.addEventListener('input', () => updateReference(r.id, input.dataset.field, input.value));
       });
       list.appendChild(div);
     });
@@ -560,6 +623,21 @@
         </div>
       `).join('');
     } else expBlock.style.display = 'none';
+
+    const refBlock = document.getElementById('refBlock');
+    const validRef = references.filter(r => r.name || r.company || r.contact);
+    if(validRef.length){
+      refBlock.style.display = '';
+      document.getElementById('pRef').innerHTML = validRef.map(r => `
+        <div class="exp-item">
+          <div class="exp-header">
+            <span class="exp-title">${escapeHTML(r.name) || 'Name'}</span>
+          </div>
+          <div class="exp-company">${[escapeHTML(r.relation), escapeHTML(r.company)].filter(Boolean).join(', ')}</div>
+          <div class="exp-desc">${escapeHTML(r.contact)}</div>
+        </div>
+      `).join('');
+    } else refBlock.style.display = 'none';
   }
 
   let mode = 'person';
@@ -582,6 +660,7 @@
   });
 
   document.getElementById('addExpBtn').addEventListener('click', () => addExperience());
+  document.getElementById('addRefBtn').addEventListener('click', () => addReference());
   document.getElementById('downloadBtn').addEventListener('click', () => window.print());
 
   // Mobile tabs
@@ -593,15 +672,4 @@
     tabEdit.classList.add('active'); tabPreview.classList.remove('active');
     editPane.classList.add('active'); previewPane.classList.remove('active');
   });
-  tabPreview.addEventListener('click', () => {
-    tabPreview.classList.add('active'); tabEdit.classList.remove('active');
-    previewPane.classList.add('active'); editPane.classList.remove('active');
-  });
-
-  // Seed one empty experience row to start
-  addExperience();
-  renderPreview();
-</script>
-
-</body>
-</html>
+  tabPreview.addEve
